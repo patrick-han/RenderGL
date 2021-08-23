@@ -13,7 +13,10 @@
 
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 600
-float lastX = DEFAULT_WINDOW_WIDTH/2, lastY = DEFAULT_WINDOW_HEIGHT/2; // Initial mouse positions (center of the scren
+
+// Initial mouse positions (center of the scren
+float lastX = DEFAULT_WINDOW_WIDTH/2;
+float lastY = DEFAULT_WINDOW_HEIGHT/2;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processKeyboardInput(GLFWwindow* window);
@@ -26,7 +29,7 @@ float lastFrame = 0.0f; // Time of last frame
 
 float arrow_key_value = 0.0;
 
-// Camera values
+// Camera setup
 float yaw = -90.0f; // By default, point camera towards -Z
 float pitch = 0.0f;
 float fov = 45.0f;
@@ -285,13 +288,21 @@ void processKeyboardInput(GLFWwindow* window)
 
 	// Update camera position based on keypresses
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{
 		camera.processMovement(FORWARD, deltaTime);
+	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{
 		camera.processMovement(BACKWARD, deltaTime);
+	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{
 		camera.processMovement(LEFT, deltaTime);
+	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
 		camera.processMovement(RIGHT, deltaTime);
+	}
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -318,9 +329,13 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 	// Restrict movement of pitch, since weird stuff happens with the lookat matrix
 	if (pitch > 89.0f)
+	{
 		pitch = 89.0f;
+	}
 	if (pitch < -89.0f)
+	{
 		pitch = -89.0f;
+	}
 
 	// Update camera pitch and yaw
 	camera.updateYawAndPitch(yaw, pitch);
@@ -330,9 +345,13 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	fov -= (float)yoffset;
 	if (fov < 1.0f)
+	{
 		fov = 1.0f;
+	}
 	if (fov > 45.0f)
+	{
 		fov = 45.0f;
+	}
 
 	// Update camera FOV
 	camera.updateFOV(fov);
