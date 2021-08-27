@@ -46,7 +46,7 @@ public:
 			{
 				std::cout << "Failed to load texture (nChannels must be 3 or 4!): " << imageFilePath << " " << std::endl;
 			}
-		}	
+		}
 		else
 		{
 			std::cout << "Failed to load texture (stbi_load() failed): " << imageFilePath << " " << std::endl;

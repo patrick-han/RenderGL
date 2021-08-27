@@ -43,7 +43,6 @@ public:
 		direction.y = sin(glm::radians(pitch));
 		direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 		cameraFront = glm::normalize(direction);
-
 		lookAt_mat = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 	}
 

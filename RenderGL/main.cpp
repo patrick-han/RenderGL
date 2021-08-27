@@ -14,27 +14,28 @@
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 600
 
-// Initial mouse positions (center of the scren
-float lastX = DEFAULT_WINDOW_WIDTH/2;
-float lastY = DEFAULT_WINDOW_HEIGHT/2;
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processKeyboardInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
+// Initial mouse position (center of the screen)
+float lastX = DEFAULT_WINDOW_WIDTH / 2;
+float lastY = DEFAULT_WINDOW_HEIGHT / 2;
+bool firstMouse = true;
+
 // Delta time setup
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
-float arrow_key_value = 0.0;
-
-// Camera setup
-float yaw = -90.0f; // By default, point camera towards -Z
+// Camera initial setup
+float yaw = -90.0f; // By default, point camera towards -Z, since yaw is measured from  the +X (0 deg). CW -> -degrees
 float pitch = 0.0f;
 float fov = 45.0f;
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f)); // Initialize camera at [0, 0, 3] (in world space i think?)
-bool firstMouse = true;
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f)); // Initialize camera at [0, 0, 3] in world coordinates
+
+// Generic global variables
+float arrow_key_value = 0.0;
 
 int main()
 {
@@ -167,18 +168,7 @@ int main()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// Set up vertex attributes
-	//// Positions
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); // Take data from currently bound VBO (GL_ARRAY_BUFFER)
-	//glEnableVertexAttribArray(0); // Enable vertex attribute
-	//// Colors
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	//glEnableVertexAttribArray(1);
-	//// Texture Coords
-	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	//glEnableVertexAttribArray(2);
-
-	// Cube
-	// Vertex
+	// Vertex Positions
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0); // Take data from currently bound VBO (GL_ARRAY_BUFFER)
 	glEnableVertexAttribArray(0); // Enable vertex attribute
 	// Texture Coords
@@ -195,8 +185,6 @@ int main()
 	ourShader.use();
 	ourShader.setInt("texture1", 0); // Tell OGL for each sampler to which texture unit it belongs to (only has to be done once)
 	ourShader.setInt("texture2", 1);
-
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // Enable wireframe mode
 
 	// Render loop
 	while (!glfwWindowShouldClose(window))
@@ -268,9 +256,12 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-// Process inputs
+// Process keyboard
 void processKeyboardInput(GLFWwindow* window)
 {
+	/*
+	* Generic keybindings
+	*/
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
@@ -286,7 +277,9 @@ void processKeyboardInput(GLFWwindow* window)
 		std::cout << arrow_key_value << std::endl;
 	}
 
-	// Update camera position based on keypresses
+	/*
+	* Camera-related keybindings
+	*/
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		camera.processMovement(FORWARD, deltaTime);
@@ -305,10 +298,11 @@ void processKeyboardInput(GLFWwindow* window)
 	}
 }
 
+// Based on the mouse position, calculate the new pitch and yaw and update the camera's internal state accordingly
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
 
-	if (firstMouse) // initially set to true, prevent mouse from jumping on entering
+	if (firstMouse) // Initially set to true, prevent mouse from jumping on entering
 	{
 		lastX = xpos;
 		lastY = ypos;
@@ -316,7 +310,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	}
 
 	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos; // reversed since y-coordinates range from bottom to top
+	float yoffset = lastY - ypos; // Reversed since y-coordinates range from bottom to top
 	lastX = xpos;
 	lastY = ypos;
 
@@ -341,6 +335,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	camera.updateYawAndPitch(yaw, pitch);
 }
 
+// Adjust FOV with scroll wheel by updating the camera's internal state
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	fov -= (float)yoffset;
@@ -353,6 +348,5 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 		fov = 45.0f;
 	}
 
-	// Update camera FOV
 	camera.updateFOV(fov);
 }
